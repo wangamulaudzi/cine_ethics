@@ -1,3 +1,10 @@
-openai
 os
 dotenv
+
+openai
+langchain
+pypdf
+chromad
+tiktoken
+huggingface_hub
+diffusers
