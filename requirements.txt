@@ -1,6 +1,7 @@
 os
 dotenv
-
+fastapi
+uvicorn
 openai
 langchain
 pypdf
