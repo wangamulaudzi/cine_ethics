@@ -1,6 +1,9 @@
+################Import Key requirements#############
 os
 dotenv
 
+
+#################Gen requirements###################
 openai
 langchain
 pypdf
@@ -8,3 +11,9 @@ chromad
 tiktoken
 huggingface_hub
 diffusers
+
+###########Interface Requirements###################
+streamlit
+xcode-select
+watchdog
+#pip install --upgrade streamlit
