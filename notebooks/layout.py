@@ -55,3 +55,11 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
     st.write('Original Synopsis :',title_1, syn_1)
     st.title(title_2)
     st.write('Original Synopsis:',title_2, syn_2)
+
+
+#st.sidebar.image('https://oaidalleapiprodscus.blob.core.windows.net/private/org-1CS5LUNScN841oINWP8rLwQR/user-j597S[…]g=Qrl21ILqHXx7rTSyrnVDfNPOxTNi8NWr5j7KFatDMew%3D', caption='Cine Pick')
+
+st.image(
+            "https://oaidalleapiprodscus.blob.core.windows.net/private/org-1CS5LUNScN841oINWP8rLwQR/user-j597S[…]g=Qrl21ILqHXx7rTSyrnVDfNPOxTNi8NWr5j7KFatDMew%3D",
+            width=1024, # Manually Adjust the width of the image as per requirement
+        )
