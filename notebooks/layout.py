@@ -19,6 +19,8 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 file_path = 'test-scripts-sample.csv'  # Update to your file path
 df = pd.read_csv(file_path, sep=';')
 
+st.write(df.head())
+
 # Streamlit layout
 st.title('Movie Synopsis Merger')
 st.sidebar.image('CinePickSmall.png', caption='Cine Pick')

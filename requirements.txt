@@ -1,6 +1,9 @@
 ################Import Key requirements#############
 os
 dotenv
+fastapi
+uvicorn
+=======
 
 
 #################Gen requirements###################
@@ -11,7 +14,6 @@ chromad
 tiktoken
 huggingface_hub
 diffusers
-<<<<<<< HEAD
 
 ###########Interface Requirements###################
 streamlit
@@ -291,4 +293,3 @@ webencodings==0.5.1
 websocket-client==1.7.0
 Werkzeug==3.0.1
 wrapt==1.14.1
->>>>>>> f52c3b2fa7499428f992a38a2b068db7cbc2c567
