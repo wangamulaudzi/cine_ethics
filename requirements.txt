@@ -1,3 +1,13 @@
+os
+dotenv
+
+openai
+langchain
+pypdf
+chromad
+tiktoken
+huggingface_hub
+diffusers
 anyio==4.3.0
 appnope==0.1.4
 argon2-cffi==23.1.0
