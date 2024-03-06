@@ -4,6 +4,12 @@ import openai
 from dotenv import load_dotenv
 import os
 
+# Load caio stuff
+import base64
+from io import BytesIO
+from PIL import Image
+
+
 # Load environment variables
 
 load_dotenv()
@@ -46,6 +52,34 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
         max_tokens=200
     )
 
+
+
+
+         # Call OpenAI API for DALL-E 2 Text to image
+    #client = OpenAI(api_key=openai_api_key)
+    prompt = f"movie poster mixing {title_1} and {title_2}"
+    response_dalle = openai.Image.create(
+                                        model="dall-e-2",
+                                        prompt=prompt,
+                                        size="1024x1024",
+                                        quality="standard",
+                                        response_format= "b64_json",
+                                        n=1,
+                                        )
+
+
+
+    firstImage = response_dalle.data[0]
+    imgData = base64.b64decode(firstImage.b64_json)
+    im_file = BytesIO(imgData)  # convert image to file-like object
+    img = Image.open(im_file)   # img is now PIL Image object
+    st.write('Generated Movie Poster')
+    st.image(img)
+
+
+
+
+
     # Display merged synopsis
     merged_synopsis = response.choices[0].message.content  # Ensure correct attribute access based on OpenAI's response structure
 
@@ -59,7 +93,7 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
 
 #st.sidebar.image('https://oaidalleapiprodscus.blob.core.windows.net/private/org-1CS5LUNScN841oINWP8rLwQR/user-j597S[…]g=Qrl21ILqHXx7rTSyrnVDfNPOxTNi8NWr5j7KFatDMew%3D', caption='Cine Pick')
 
-st.image(
-            "https://oaidalleapiprodscus.blob.core.windows.net/private/org-1CS5LUNScN841oINWP8rLwQR/user-j597S[…]g=Qrl21ILqHXx7rTSyrnVDfNPOxTNi8NWr5j7KFatDMew%3D",
-            width=1024, # Manually Adjust the width of the image as per requirement
-        )
+# st.image(
+#             "https://oaidalleapiprodscus.blob.core.windows.net/private/org-1CS5LUNScN841oINWP8rLwQR/user-j597S[…]g=Qrl21ILqHXx7rTSyrnVDfNPOxTNi8NWr5j7KFatDMew%3D",
+#             width=1024, # Manually Adjust the width of the image as per requirement
+#         )
