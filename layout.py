@@ -10,6 +10,12 @@ from api import openai_api
 from identify_faces import movies_to_analyse
 from PIL import Image
 
+
+# Load New sumarizer stuff
+from transformers import pipeline
+
+
+
 # Functions
 # Function to filter DataFrame based on search query
 def filter_options(search_query, max_suggestions=5):
@@ -99,9 +105,11 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
 
     st.title("Original Synopses")
     with st.expander(f"Show/hide {title_1} synopsis"):
+        syn_1 = summarizer(syn_1, max_length=130, min_length=30, do_sample=False)
         st.markdown(f"""{syn_1}""")
 
     with st.expander(f"Show/hide {title_2} synopsis"):
+        syn_2 = summarizer(syn_2, max_length=130, min_length=30, do_sample=False)
         st.markdown(f"""{syn_2}""")
 
     faces_title_1, faces_title_2 = movies_to_analyse(title_1, title_2)
