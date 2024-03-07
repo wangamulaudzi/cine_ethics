@@ -71,7 +71,7 @@ endpoint(df)
 
 # Multiselect for selecting movies
 selected_indices = st.sidebar.multiselect('Select two movies to merge:', df.index,
-                                 format_func=lambda x: df['title'].loc[x])
+                                 format_func=lambda x: df['title'].loc[x].title())
 
 # Check if more than two movies are selected
 if len(selected_indices) > 2:
