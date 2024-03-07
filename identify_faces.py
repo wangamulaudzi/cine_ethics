@@ -162,7 +162,7 @@ def movie_to_analyse(title):
             # force resize the face ROI to 96x96 and then add it to the
             # faces montage list
             # face = cv2.resize(face, (96, 96))
-            faces.append(face)
+            faces.append(image)
 
         grouped_faces.append(faces)
 

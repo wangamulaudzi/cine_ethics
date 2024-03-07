@@ -2,9 +2,6 @@
 import streamlit as st
 import pandas as pd
 
-# Search bar import statements
-import uvicorn
-
 # API for the search bar
 from api import endpoint
 from api import openai_api
