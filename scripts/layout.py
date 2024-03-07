@@ -35,8 +35,8 @@ df = pd.read_csv(file_path, sep=',')
 st.sidebar.image('raw_data/logo/CinePickSmall.png')#, caption='Cine Pick')
 
 # Sidebar for search functionality
-#st.sidebar.title("Search & Select Movies")
-search_query = st.sidebar.text_input('Search movie titles:', key="search_input")
+# #st.sidebar.title("Search & Select Movies")
+# search_query = st.sidebar.text_input('Search movie titles:', key="search_input")
 
 # Define the JavaScript code as a string
 javascript_code = """
@@ -69,12 +69,9 @@ st.write("<datalist id='suggestions'></datalist>", unsafe_allow_html=True)
 # Create an endpoint for the suggestion's search bar
 endpoint(df)
 
-# Filter dataframe based on search query
-filtered_df = df[df['title'].str.contains(search_query, case=False, na=False)] if search_query else df
-
-# Selection of movies in the sidebar
-selected_indices = st.sidebar.multiselect('Select movies two movies to merge:', filtered_df.index,
-                                          format_func=lambda x: filtered_df['title'].loc[x])
+# Multiselect for selecting movies
+selected_indices = st.sidebar.multiselect('Select two movies to merge:', df.index,
+                                 format_func=lambda x: df['title'].loc[x])
 
 # Check if more than two movies are selected
 if len(selected_indices) > 2:
@@ -84,8 +81,11 @@ if len(selected_indices) > 2:
 
 # Main body - Merge Synopses button and display area
 if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
-    title_1, title_2 = filtered_df['title'].loc[selected_indices].values
-    syn_1, syn_2 = filtered_df['plot_synopsis'].loc[selected_indices].values
+    title_1, title_2 = df['title'].loc[selected_indices].values
+    title_1, title_2 = title_1.title(), title_2.title()
+
+    syn_1, syn_2 = df['plot_synopsis'].loc[selected_indices].values
+
     prompt = f"Merge and rewrite the synopsis from '{title_1}' and '{title_2}'. Create a new synopsis incorporating elements from both."
 
     # Call OpenAI API for synopsis merging
@@ -101,10 +101,11 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
     st.write(merged_synopsis)
 
     st.title("Original Synopses")
-    st.subheader(title_1)
-    st.write(title_1, syn_1)
-    st.subheader(title_2)
-    st.write(title_2, syn_2)
+    with st.expander(f"Show/hide {title_1} synopsis"):
+        st.markdown(f"""{syn_1}""")
+
+    with st.expander(f"Show/hide {title_2} synopsis"):
+        st.markdown(f"""{syn_2}""")
 
     faces_title_1, faces_title_2 = movies_to_analyse(title_1, title_2)
 
