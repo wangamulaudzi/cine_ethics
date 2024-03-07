@@ -16,6 +16,8 @@ from PIL import Image
 
 # Load New sumarizer stuff
 from transformers import pipeline
+# Initialize the summarization pipeline with the BART model
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 
 
