@@ -54,7 +54,7 @@ def movie_to_analyse(title):
     blobs = bucket.list_blobs(prefix=movie_path)
 
     # Get a random sample of blobs
-    sample_size = 500 # Number of images to sample as opposed to the full 1k
+    sample_size = 100 # Number of images to sample as opposed to the full 1k
     random_sample = random.sample(list(blobs), sample_size)
 
     for blob in random_sample:
@@ -162,7 +162,7 @@ def movie_to_analyse(title):
             # force resize the face ROI to 96x96 and then add it to the
             # faces montage list
             # face = cv2.resize(face, (96, 96))
-            faces.append(face)
+            faces.append(image)
 
         grouped_faces.append(faces)
 

@@ -9,6 +9,9 @@ from PIL import Image
 from dotenv import load_dotenv
 import os
 
+#loading credentials
+load_dotenv()
+
 def endpoint(df):
     """
     Creates an endpoint for the suggestion's search bar.
