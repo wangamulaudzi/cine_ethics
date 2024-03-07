@@ -7,7 +7,7 @@ uvicorn
 
 
 #################Gen requirements###################
-openai
+openai==0.28
 langchain
 pypdf
 chromad
