@@ -1,13 +1,26 @@
+################Import Key requirements#############
 os
 dotenv
+fastapi
+uvicorn
+=======
 
-openai
+
+#################Gen requirements###################
+openai==0.28
 langchain
 pypdf
 chromad
 tiktoken
 huggingface_hub
 diffusers
+
+###########Interface Requirements###################
+streamlit
+xcode-select
+watchdog
+#pip install --upgrade streamlit
+=======
 anyio==4.3.0
 appnope==0.1.4
 argon2-cffi==23.1.0
