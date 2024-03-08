@@ -34,7 +34,7 @@ def endpoint(df):
         suggestions = [title for title in df["title"] if query.lower() in title.lower()]
         return suggestions
 
-def openai_api(title_1, title_2, prompt):
+def openai_api(title_1, title_2):
     """
     Creates an endpoint for the openai API.
 
@@ -52,6 +52,7 @@ def openai_api(title_1, title_2, prompt):
     openai_api_key = os.getenv('OPENAI_API_KEY')
 
     openai.api_key = openai_api_key
+    prompt = f"Merge and rewrite the synopsis from '{title_1}' and '{title_2}'. Create a new synopsis incorporating elements from both."
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  # Update model as necessary
         messages=[
@@ -64,10 +65,10 @@ def openai_api(title_1, title_2, prompt):
 
     # Call OpenAI API for DALL-E 2 Text to image
     #client = OpenAI(api_key=openai_api_key)
-    prompt = f"movie poster mixing {title_1} and {title_2}"
+    prompt_image = f"movie poster mixing {title_1} and {title_2}"
     response_dalle = openai.Image.create(
                                         model="dall-e-2",
-                                        prompt=prompt,
+                                        prompt=prompt_image,
                                         size="1024x1024",
                                         quality="standard",
                                         response_format= "b64_json",

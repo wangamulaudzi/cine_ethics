@@ -10,10 +10,10 @@ import pickle
 import pandas as pd
 from PIL import Image
 from sklearn.cluster import DBSCAN
-from dotenv import load_dotenv
 import random
+from dotenv import load_dotenv
 
-# Load the credentials
+#loading credentials
 load_dotenv()
 
 # Get the path to the key file from the environment variable
@@ -25,7 +25,7 @@ client = storage.Client.from_service_account_json(key_file_path)
 bucket_name = "cine_ethics"
 bucket = client.get_bucket(bucket_name)
 
-synopsis_screengrabs_df = pd.read_csv("raw_data/synopsis_screengrabs_final_table.csv")
+synopsis_screengrabs_df = pd.read_csv("raw_data/final_table.csv")
 
 def movie_to_analyse(title):
     """
@@ -154,7 +154,8 @@ def movie_to_analyse(title):
             blob = client.bucket(bucket_name).blob(data[i]["imagePath"])
             image_bytes = blob.download_as_string()
             nparr = np.frombuffer(image_bytes, np.uint8)
-            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            image_color = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            image = cv2.cvtColor(image_color, cv2.COLOR_BGR2RGB)
 
             (top, right, bottom, left) = data[i]["loc"]
             face = image[top:bottom, left:right]
