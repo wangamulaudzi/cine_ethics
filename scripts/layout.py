@@ -27,7 +27,7 @@ def filter_options(search_query, max_suggestions=5):
 
 # Streamlit functionality
 # Load dataset
-file_path = 'raw_data/synopsis_screengrabs_final_table.csv'  # Update to your file path
+file_path = 'raw_data/final_table.csv'  # Update to your file path
 df = pd.read_csv(file_path, sep=',')
 
 # Streamlit layout
