@@ -2,8 +2,10 @@
 import streamlit as st
 import pandas as pd
 
-# Search bar import statements
-import uvicorn
+import os #A
+import openai #A
+
+from dotenv import load_dotenv #A
 
 # API for the search bar
 from api import endpoint
@@ -24,6 +26,12 @@ def filter_options(search_query, max_suggestions=5):
     """
     suggestions = df[df['title'].str.contains(search_query, case=False)][:max_suggestions]
     return suggestions['title'].tolist()
+
+# Load environment variables (Ana)
+load_dotenv()
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
+
 
 # Streamlit functionality
 # Load dataset

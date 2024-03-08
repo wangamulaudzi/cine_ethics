@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ornate-lens-411311",
+  "private_key_id": "fc7d3fc950adebbd355415601e10d1c9cb5ba0de",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEA7wEyUQSmHuc\n/Ycdhh/C8RSLDKYLnHLnjG8gZB9OqbAjtV+05PmoZc6pJJnFgbXOAmKFzeugLqBA\n3WrLOwCvaiwey8OaMcrqjIi+ssv2MZ7ZJqF/TfFbf2HzSFCEBEbdaIAUstdV0ocZ\nOwK8c8FkCNORodhj+SewwJxCxZvzJvo2nNecHAX0ENBqC8NWsTkevKeHgEoQ9STn\nW+XzfcmXInCsGafgiWamoBn/Mr+z8NANT9P0F3zfKxFH3aiZ5Dd03BA68g6r56g3\nyFlXEl0rXr4VJ3YbB6xCeaLXGPsp5j1kTb55h+xp54S+e+LQrYWiRakWHpcPgyj3\nhTxE+6llAgMBAAECggEAJmvM+OsyiqqU4ErZpzHZG+8BZdgO3AvIghaG2cSGVnbw\nba9pmR2gyh9aiNEByzMHnd/dy/h3DSjWhKBiBIAGPFwFVev+5USJT7xIOYj2bcWA\nK3RlB30RqCup2XP9RENKWK/ZGzWK++mOTaXBfYr7B06rmcotjjsSSpUWjAgL73cG\nlawqhHY1vvNAylDFDPl7JlkQTOEjYZv7tkGHkFzf4tstfIZydliEOfWg15RDYPBO\nHrq4DT7cmei5lSj2Gmf8Ry88qEDERVtaTaeYsFl8RL++EtBsAySQRXlRRK3gyict\n597cL3VWQ/zCzH8EQF7eCnegvhIIc/yM3coDh83WaQKBgQDisKgvuwVFxQC64Rgu\npa8VvxDZfAhsVrg7fET9bcpAhY2pZMDh5B8s64fD9xpm/u+KJn0Zctt/I30QVH5G\nfbx8tECoc0SEM+tnNbfUoFKDdYLVdnmOd4wlgE7xJGtHEkPq9b4q2DvT/vo5or9X\n9q+VdzV8f5RnkuAgVGXEarfX9wKBgQDdW7t/VRjwTsTW9+vmrpEFrw/AsaRruOU9\njRo4UVIe2xNlhBb9c2hhdWNzOPoyGgxVBs+5RRy05kKZkIRYW5DHPnwAXKJUqNt1\nZk5ovEk5cRDm2uScmNRMkRx9hojEUDs2HNbW5uWMp0oaqEZukMC1wF+LdAIk2D9f\n9OQ2+CuKgwKBgGRBLKCvXY2VqtT7Z+55aA1+Cr2klTUUxTXJp9lNDP2sExKvdH5y\nnTcIk2qfhhW2+clnbDwtB9Yao9ztAUu7n/im31GgaNTvAVUL9NkcbmGlPs+ZLflL\n9bdAH6mWKbus4EyxkgDw0MTZJ2EGEQmeF9lKd2UwJzoHQwgJS1iqudPRAoGAMJ4H\nLk5Ibe8++F/3ZfENVQxAD3h0vlwbrUsiaSAjQzemqPM8AWqpkE4yC4qGGR7zenFG\nilCNn4W7NvMwvh9OSxSEM6gk1ydHHB/eNM613nHg3nNRJrvCVRbCBSfZPhTJDHeF\nECoiXKQZeIVhAsO0L7cSxRQzrFf6g17MCO600XUCgYAjKfW06+ZRkW6PQg8VPXer\nPuRMWfkCeusC/LHqyBrpp46NZplBlJsqYLFuvX9tRVT7rJIS1QpQMUt/qYbeZiRU\n45YYVi4SKsjq40HndgRi0phQm3SfJxTcdpleEdGVE22qHc+tH2IfWrE+PT1ZwRu6\nO4RxR+PhMHDFPyuILBCASw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "le-wagon-gcp@ornate-lens-411311.iam.gserviceaccount.com",
+  "client_id": "107197105495979582875",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/le-wagon-gcp%40ornate-lens-411311.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
