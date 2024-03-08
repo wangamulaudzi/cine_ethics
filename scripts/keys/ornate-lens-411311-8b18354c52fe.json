@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ornate-lens-411311",
+  "private_key_id": "8b18354c52feb5ab261655ac6ab5a2e22dd56334",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDL6EfGPjWO0n32\nIrhcxfX47xM1ac6EnTKwTwXvfcun7PNLQZeZN3fzJ4PKilj8bnxhGHH0sQ1tIKFd\nfZrvm7j3BrPBDfKEBwbyrRIQ/z2pBcK0yA9LCrYG03RySI1W+Iga7/MFQ7Gllk+a\n26+xUOwsuye2kyEAl7gprpWXxNhD+gEWnj5wQfakMZddMWry+4aEA27snD+SMcrg\nIo8gw6ujOPRQjuSzp9h9ZMLNhs7L26dcQMFkTW4MufYz3EIR1qJ1uD+qe504dW98\n6o4wpidhpxIFQC+Mmfde4WAKXkSheJaQbVD/gF73BC936qfNjeeLrNk6JyZbxDM8\nHOQ1QoyPAgMBAAECggEAKOWbM7M5eb5VHj9je9QGnBmTYDSrA6Uly//lgF3aMYGQ\nYIk01zmtWLsVr1NlOqgMUUseXAYA2+DeDIrLPwCcLguNlQxvljR0m8rDo14WJ2bs\n4OZ5TsNEtATIR72uf4GUhtaWhvlHUZ9eswAZ8nX5EJWvBurmhSBpAw8tmMWV3LgV\naFJVvq13BLBh81lE67blZ4rVmi7F5GWiRR+lsxepexg0+duY7sw5IRxyMJbXaUo6\nPuePUG0KpY0WZpdVNLd37sEWXXtkJH9E9/d7DF6erumvGAl21vU9JoExBrwPO600\ntt14TJCPR3azUOY/ww1rI0YFA8cIoQUwjajniHhHcQKBgQD54gAbmPfz2Enjepm1\nzxH2Dc/IODPns+ZxPTj6plO+LsZEQMT5MBX09ZzUVXx2Uy2BAWiun6L/m9AYNkOF\n+c4YONJTkbFyJzn3w9mAol4K1OBJxj1CyoOE87uNWyxKxus+edt64AxWogTVPrIa\nzIOMKs3gII9qtABi0CHdZn02kQKBgQDQ5ieV3+wsLfy+W85NhPvDHByWyGvi6aXy\nzIsqJTQ2l2JMJkCwCWyYEJZjjpBH5Rl4fdiL1IqWRu3IYPKwE4pw20ZxLvy3HsKN\ne4iiXR8VrJ8/A+G2ElEbJIMSmIET42ezDvD4/mBV9lNsk9mzTCK/KLgX+5vVopGB\ntBS2IaxhHwKBgQDPs4S3a7yd2OgBxwRA1K9vQCe3ms+6BhTDh0n3PY1aBXMThGq1\nXbzCce07qRrdF2I5WrxyeYp4wECF/4S8tdkS1RguEmnWIrjSMt51R4C3rB4J9Fcz\nTzVmq1j3tBLqzND4iz1dsyFOWTl/Lq/ICrpFJcceRrIu1ROFDs83QltNoQKBgQC/\nUEkopW6x91vlKkcCD6xSv8ge/2Zu5fSpLFK3QmNTK8lGXDIaBkeB7I8Oll3kuhhd\nlUNgrEJP5p2WSdN5FixPt0IIHjQrsOwUjvJPYGE7hGBDYdaw3I2TAhlYSnrMMBOk\nlSZzouOvVmyIn89cuXmJAE25CSFqwfvogXgGZUhtmQKBgQCMoKr0mFXipJQAgcn0\nMMgSn5y+cmWkbLwhCIvoNjrJcRq8l2zoiLpl/HyMme11XW9Ac495jZM+KP/UkoAU\nUXOSJEq+278bkMgf/tdOk3A68qiF+LYz4wO303W4YOjCxnTdkGUGLSBTh0qv+I2t\nJdfciSfUaDmcR6YhdqoukDuFCQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cine-ethics-bucket@ornate-lens-411311.iam.gserviceaccount.com",
+  "client_id": "105088134028409943136",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cine-ethics-bucket%40ornate-lens-411311.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

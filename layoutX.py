@@ -14,12 +14,10 @@ from identify_faces import movies_to_analyse
 from PIL import Image
 
 
-# Load New sumarizer stuff
+# Load New summarization stuff
 from transformers import pipeline
-
-
-#Initialize the summarization pipeline with the model
-summarizer = pipeline("summarization", model="Falconsai/text_summarization")
+# Initialize the summarization pipeline with the BART model
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 
 # Functions
@@ -111,13 +109,12 @@ if st.sidebar.button('Merge Synopses') and len(selected_indices) == 2:
 
     st.title("Original Synopses")
     with st.expander(f"Show/hide {title_1} synopsis"):
-
-        syn_1_modified = summarizer(syn_1) #(1, max_length=130, min_length=30, do_sample=False)
-        st.markdown(f"""{syn_1_modified}""")
+        syn_1 = summarizer(syn_1, max_length=130, min_length=30, do_sample=False)
+        st.markdown(f"""{syn_1}""")
 
     with st.expander(f"Show/hide {title_2} synopsis"):
-        syn_2_modified   = summarizer(syn_2) #(2, max_length=130, min_length=30, do_sample=False)
-        st.markdown(f"""{syn_2_modified}""")
+        syn_2 = summarizer(syn_2, max_length=130, min_length=30, do_sample=False)
+        st.markdown(f"""{syn_2}""")
 
     faces_title_1, faces_title_2 = movies_to_analyse(title_1, title_2)
 
