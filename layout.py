@@ -63,6 +63,11 @@ input.addEventListener('input', function(e) {
 # Render the JavaScript code using st.markdown
 st.markdown(javascript_code, unsafe_allow_html=True)
 
+page_bg_img = '''<style>body {background-image: "raw_data/logo/CinePickSmall.png"; background-size: cover;}</style>'''
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+
 # Placeholder for displaying suggestions
 st.write("<datalist id='suggestions'></datalist>", unsafe_allow_html=True)
 
@@ -75,10 +80,23 @@ endpoint(df)
 # MOVIE SELECTION SIDEBAR SECTION #
 ###################################
 
+# Streamlit layout for sidebar genre selection functionality
+st.sidebar.title('Movie Synopsis Merger 🍿🎬')  # Title
+st.sidebar.caption("Discover your own innovative plot!")  # Description
+
+
+# Select Genre Radio Button
+st.markdown("""<style>span[data-baseweb="tag"] {  background-color: blue !important;}</style>""", unsafe_allow_html=True)
+genre = st.sidebar.multiselect("Choose the movie genre", df['genre'].unique(), default=df['genre'].unique())
+
+data = df.loc[df['genre'].isin(genre)]
+
+
 # Multiselect field for selecting movies
 selected_indices = st.sidebar.multiselect('Select two movies to merge:',
-                                          df.index,
-                                          format_func=lambda x: df['title'].loc[x].title())
+                                        data.index,
+                                        format_func=lambda x: data['title'].loc[x].title())
+
 
 # Check if more than two movies are selected
 if len(selected_indices) > 2:
@@ -133,8 +151,8 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     #################################
 
     st.title(f"{title_1}")
-    selected_images_1 = display_characters(faces_title_1)
-    st.write(selected_images_1)
+    display_characters(faces_title_1)
+
 
     ###################################
     # DISPLAYING FIRST MOVIE SYNOPSIS #
@@ -150,7 +168,7 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
     st.title(f"{title_2}")
     selected_images_2 = display_characters(faces_title_2)
-    st.write(selected_images_2)
+
 
     ####################################
     # DISPLAYING SECOND MOVIE SYNOPSIS #
