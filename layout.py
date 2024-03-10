@@ -16,9 +16,13 @@ from cine_utils.image_display import display_characters
 from dotenv import load_dotenv
 import os
 
+# Imports for morphing the characters
+from cine_utils.morph import index_face, image_mixer_api
+import cv2
+from PIL import Image
+
 #loading credentials
 load_dotenv()
-
 
 ###################
 # LOADING DATASET #
@@ -69,6 +73,11 @@ input.addEventListener('input', function(e) {
 # Render the JavaScript code using st.markdown
 st.markdown(javascript_code, unsafe_allow_html=True)
 
+page_bg_img = '''<style>body {background-image: "raw_data/logo/CinePickSmall.png"; background-size: cover;}</style>'''
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+
 # Placeholder for displaying suggestions
 st.write("<datalist id='suggestions'></datalist>", unsafe_allow_html=True)
 
@@ -81,10 +90,23 @@ endpoint(df)
 # MOVIE SELECTION SIDEBAR SECTION #
 ###################################
 
+# Streamlit layout for sidebar genre selection functionality
+st.sidebar.title('Movie Synopsis Merger 🍿🎬')  # Title
+st.sidebar.caption("Discover your own innovative plot!")  # Description
+
+
+# Select Genre Radio Button
+st.markdown("""<style>span[data-baseweb="tag"] {  background-color: blue !important;}</style>""", unsafe_allow_html=True)
+genre = st.sidebar.multiselect("Choose the movie genre", df['genre'].unique(), default=df['genre'].unique())
+
+data = df.loc[df['genre'].isin(genre)]
+
+
 # Multiselect field for selecting movies
 selected_indices = st.sidebar.multiselect('Select two movies to merge:',
-                                          df.index,
-                                          format_func=lambda x: df['title'].loc[x].title())
+                                        data.index,
+                                        format_func=lambda x: data['title'].loc[x].title())
+
 
 # Check if more than two movies are selected
 if len(selected_indices) > 2:
@@ -105,7 +127,7 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     title_1, title_2 = title_1.title(), title_2.title()
 
     # Getting original synopsis of the selected movies.
-    syn_1, syn_2 = df['synopsis'].loc[selected_indices].values
+    syn_1, syn_2 = df['summarized_synopsis'].loc[selected_indices].values
 
 
     ##################################
@@ -140,7 +162,6 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
     st.title(f"{title_1}")
     selected_image_1 = display_characters(faces_title_1)
-    st.write(selected_image_1)
 
     ###################################
     # DISPLAYING FIRST MOVIE SYNOPSIS #
@@ -156,7 +177,6 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
     st.title(f"{title_2}")
     selected_image_2 = display_characters(faces_title_2)
-    st.write(selected_image_2)
 
     ####################################
     # DISPLAYING SECOND MOVIE SYNOPSIS #
@@ -164,3 +184,42 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
     with st.expander(f"Show/hide {title_2} synopsis"): # Dropdown to hide or show sinopsis
         st.markdown(f"""{syn_2}""")
+
+    # Check if both images are selected
+    if selected_image_1 and selected_image_2:
+        ####################
+        # SELECTED IMAGE 1 #
+        ####################
+
+        # Find the index of selected_image_1 in faces_title_1
+        indx_image_1 = index_face(faces_title_1, selected_image_1)
+
+        ####################
+        # SELECTED IMAGE 2 #
+        ####################
+
+        # Find the index of selected_image_2 in faces_title_2
+        indx_image_2 = index_face(faces_title_1, selected_image_1)
+
+        # Save the selected images
+        path_1 = "raw_data/morph/selected_image_1.png"
+        cv2.imwrite(path_1, imread_faces_title_1[indx_image_1])
+
+        path_2 = "raw_data/morph/selected_image_2.png"
+        cv2.imwrite(path_2, imread_faces_title_2[indx_image_2])
+
+        ####################
+        # MORPH THE IMAGES #
+        ####################
+
+        with st.spinner('Generating New Character'): # Spinner tho show that it's loading
+
+            morph_path = image_mixer_api(path_1, path_2)
+
+            # Open the image using PIL
+            morphed_image = Image.open(morph_path)
+
+            st.title('Generated Character')
+
+            # Display the image in Streamlit
+            st.image(morphed_image)

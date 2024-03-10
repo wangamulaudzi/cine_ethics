@@ -56,7 +56,7 @@ def movie_to_analyse(title):
     blobs = bucket.list_blobs(prefix=movie_path)
 
     # Get a random sample of blobs
-    sample_size = 100 # Number of images to sample as opposed to the full 1k
+    sample_size = 200 # Number of images to sample as opposed to the full 1k
     random_sample = random.sample(list(blobs), sample_size)
 
     for blob in random_sample:
@@ -77,7 +77,6 @@ def movie_to_analyse(title):
 
         # If image is detected as a face
         if len(faces) > 0:
-            #print("Processing", blob.name, "...")
 
             # Append the image with detected faces
             faces_list.append(img)
@@ -108,8 +107,6 @@ def movie_to_analyse(title):
     path_encodings = os.path.join("raw_data/deep_face_encodings/", movie_info["title"].values[0])
     path_encodings = str(path_encodings)
 
-    print("Creating directory", path_encodings)
-
     # Ensure that the directory exists
     os.makedirs(str(path_encodings), exist_ok=True)
 
@@ -137,7 +134,9 @@ def movie_to_analyse(title):
     # determine the total number of unique faces found in the dataset
     labelIDs = np.unique(clt.labels_)
 
-    grouped_faces = []
+    grouped_faces = [] # Numpy arrays for each set of grouped faces
+    grouped_imread_faces = [] # Corresponding imread objects
+    grouped_bounding_boxes = [] # Corresponding bounding boxes
 
     # Loop over the unique face integers
     for labelID in labelIDs:
@@ -164,10 +163,10 @@ def movie_to_analyse(title):
             nparr = np.frombuffer(image_bytes, np.uint8)
             image_color = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # Append the coloured image for later analysis
-            all_faces_for_morph.append(image_color)
-
             image = cv2.cvtColor(image_color, cv2.COLOR_BGR2RGB)
+
+            # Append the coloured image for later analysis
+            all_faces_for_morph.append(image)
 
             (top, right, bottom, left) = data[i]["loc"]
 
@@ -179,6 +178,8 @@ def movie_to_analyse(title):
             faces.append(image)
 
         grouped_faces.append(faces)
+        grouped_imread_faces.append(all_faces_for_morph)
+        grouped_bounding_boxes.append(bounding_box_faces)
 
     # List to store one random photo for each character
     random_faces = []
@@ -196,15 +197,12 @@ def movie_to_analyse(title):
         # Finding index where grouped_faces[i] == random_face[0]
         indx_random_face = np.where([np.array_equal(arr, random_face[0]) for arr in grouped_faces[i]])[0][0]
 
-        print("INDEX RANDOM FACE", indx_random_face)
-        # print("INDEX RANDOM FACE SHAPE", indx_random_face.shape)
-
         # Select the random face's imread object
-        random_face_imread = all_faces_for_morph[indx_random_face]
+        random_face_imread = grouped_imread_faces[i][indx_random_face]
         random_face_imread_list.append(random_face_imread)
 
         # Select the random face's bounding box
-        random_face_bounds = bounding_box_faces[indx_random_face]
+        random_face_bounds = grouped_bounding_boxes[i][indx_random_face]
         random_face_bounds_list.append(random_face_bounds)
 
     return random_faces, random_face_imread_list, random_face_bounds_list
