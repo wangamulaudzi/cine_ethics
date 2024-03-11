@@ -56,7 +56,11 @@ def movie_to_analyse(title):
     blobs = bucket.list_blobs(prefix=movie_path)
 
     # Get a random sample of blobs
+<<<<<<< HEAD
     sample_size = 50 # Number of images to sample as opposed to the full 1k
+=======
+    sample_size = 100 # Number of images to sample as opposed to the full 1k
+>>>>>>> 821240b7b237df7d360ee1e85f09343226117b5e
     random_sample = random.sample(list(blobs), sample_size)
 
     for blob in random_sample:
