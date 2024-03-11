@@ -1,0 +1,95 @@
+# Basic Google Colab requirements
+google-colab
+google-cloud-storage==2.14.0
+
+# Data Handling
+pandas==2.2.1
+pyarrow==15.0.0
+numpy==1.26.4
+
+# HTTP and Async Handling
+aiohttp==3.9.3
+aiosignal==1.3.1
+async-timeout==4.0.3
+httpcore==1.0.4
+httpx==0.27.0
+idna==3.6
+yarl==1.9.4
+requests==2.31.0
+
+# Authentication and Google APIs
+google-auth==2.28.1
+google-auth-oauthlib==1.2.0
+google-api-core==2.17.1
+google-cloud-core==2.4.1
+google-crc32c==1.5.0
+google-resumable-media==2.7.0
+googleapis-common-protos==1.62.0
+oauthlib==3.2.2
+
+# Visualization Libraries
+matplotlib==3.5.0  # Please replace with actual version if necessary
+seaborn==0.11.2   # Please replace with actual version if necessary
+altair==5.2.0
+pydeck==0.8.1b0
+
+# Natural Language Processing and AI
+transformers==4.15.0  # Please replace with actual version if necessary
+huggingface-hub==0.21.4
+
+# Image and Face Recognition
+dlib==19.24.2
+face-recognition==1.3.0
+face_recognition_models==0.3.0
+opencv-python==4.9.0.80
+
+# Web Frameworks and Server-Side Tools
+fastapi==0.110.0
+starlette==0.36.3
+
+# Utility and Miscellaneous
+tqdm==4.66.2
+GitPython==3.1.42
+gitdb==4.0.11
+fsspec==2024.2.0
+frozenlist==1.4.1
+distro==1.9.0
+
+# Python Utilities and Types
+attrs==23.2.0
+click==8.1.7
+importlib-metadata==7.0.1
+jsonschema==4.21.1
+pydantic==2.6.3
+pydantic_core==2.16.3
+typing_extensions==4.10.0
+multidict==6.0.5
+
+# Security
+certifi==2024.2.2
+cachetools==5.3.3
+rsa==4.9
+pyasn1==0.5.1
+pyasn1-modules==0.3.0
+
+# Text Processing and Markup
+markdown-it-py==3.0.0
+mdurl==0.1.2
+Jinja2==3.1.3
+MarkupSafe==2.1.5
+
+# Date and Time Handling
+python-dateutil==2.9.0.post0
+pytz==2024.1
+tzdata==2024.1
+tzlocal==5.2
+
+# Error Handling
+exceptiongroup==1.2.0
+
+# File Handling
+filelock==3.13.1
+
+# Analytics and Machine Learning
+scikit-learn==1.4.1.post1
+scipy==1.12.0

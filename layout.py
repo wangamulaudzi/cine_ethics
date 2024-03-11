@@ -12,13 +12,23 @@ from cine_utils.identify_faces import movies_to_analyse
 # Image display
 from cine_utils.image_display import display_characters
 
+# Imports for loading the big dataframe
+from dotenv import load_dotenv
+import os
 
+# Imports for morphing the characters
+from cine_utils.morph import index_face, image_mixer_api
+import cv2
+from PIL import Image
+
+#loading credentials
+load_dotenv()
 
 ###################
 # LOADING DATASET #
 ###################
 
-file_path = 'raw_data/final_table.csv'
+file_path = os.getenv("CINE_PICK_TABLE")
 df = pd.read_csv(file_path, sep=',')
 
 
@@ -117,7 +127,7 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     title_1, title_2 = title_1.title(), title_2.title()
 
     # Getting original synopsis of the selected movies.
-    syn_1, syn_2 = df['synopsis'].loc[selected_indices].values
+    syn_1, syn_2 = df['summarized_synopsis'].loc[selected_indices].values
 
 
     ##################################
@@ -139,20 +149,19 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
 
 
-    ##############################
-    # LOADING CHARACTER PICTURES #
-    ##############################
+    #################################################################
+    # LOADING CHARACTER PICTURES, IMREAD OBJECTS AND BOUNDING BOXES #
+    #################################################################
 
     with st.spinner('Loading Characters'): # Spinner tho show that it's loading
-        faces_title_1, faces_title_2 = movies_to_analyse(title_1, title_2)
+        faces_title_1, imread_faces_title_1, faces_bounds_title_1, faces_title_2, imread_faces_title_2, faces_bounds_title_2 = movies_to_analyse(title_1, title_2)
 
     #################################
     # DISPLAYING FIRST MOVIE IMAGES #
     #################################
 
     st.title(f"{title_1}")
-    display_characters(faces_title_1)
-
+    selected_image_1 = display_characters(faces_title_1)
 
     ###################################
     # DISPLAYING FIRST MOVIE SYNOPSIS #
@@ -167,8 +176,7 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     ##################################
 
     st.title(f"{title_2}")
-    selected_images_2 = display_characters(faces_title_2)
-
+    selected_image_2 = display_characters(faces_title_2)
 
     ####################################
     # DISPLAYING SECOND MOVIE SYNOPSIS #
@@ -176,3 +184,42 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
 
     with st.expander(f"Show/hide {title_2} synopsis"): # Dropdown to hide or show sinopsis
         st.markdown(f"""{syn_2}""")
+
+    # Check if both images are selected
+    if selected_image_1 and selected_image_2:
+        ####################
+        # SELECTED IMAGE 1 #
+        ####################
+
+        # Find the index of selected_image_1 in faces_title_1
+        indx_image_1 = index_face(faces_title_1, selected_image_1)
+
+        ####################
+        # SELECTED IMAGE 2 #
+        ####################
+
+        # Find the index of selected_image_2 in faces_title_2
+        indx_image_2 = index_face(faces_title_1, selected_image_1)
+
+        # Save the selected images
+        path_1 = "raw_data/morph/selected_image_1.png"
+        cv2.imwrite(path_1, imread_faces_title_1[indx_image_1])
+
+        path_2 = "raw_data/morph/selected_image_2.png"
+        cv2.imwrite(path_2, imread_faces_title_2[indx_image_2])
+
+        ####################
+        # MORPH THE IMAGES #
+        ####################
+
+        with st.spinner('Generating New Character'): # Spinner tho show that it's loading
+
+            morph_path = image_mixer_api(path_1, path_2)
+
+            # Open the image using PIL
+            morphed_image = Image.open(morph_path)
+
+            st.title('Generated Character')
+
+            # Display the image in Streamlit
+            st.image(morphed_image)
