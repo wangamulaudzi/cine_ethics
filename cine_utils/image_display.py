@@ -1,6 +1,5 @@
 from PIL import Image
 import streamlit as st
-from streamlit_image_select import image_select
 
 def display_characters(faces_title):
     # Create a list of images
@@ -14,16 +13,4 @@ def display_characters(faces_title):
         char_list.append(pil_image)
         #char_list.append(image_data)
 
-    # Display images as clickable boxes
-    selected_images = image_select(label='Select Image to Merge',
-                                    images=char_list,
-                                    captions=None,
-                                    index=0,
-                                    center = False,
-                                    width = 455,
-                                    height = 256,
-                                    use_container_width=True,
-                                    return_value='original',
-                                    key=None,
-                                    label_visibility = 'hidden')
-    return selected_images
+    return char_list
