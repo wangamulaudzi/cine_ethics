@@ -25,7 +25,9 @@ client = storage.Client.from_service_account_json(key_file_path)
 bucket_name = "cine_ethics"
 bucket = client.get_bucket(bucket_name)
 
-synopsis_screengrabs_df = pd.read_csv("raw_data/final_table.csv")
+table_path = os.getenv("CINE_PICK_TABLE")
+
+synopsis_screengrabs_df = pd.read_csv(table_path)
 
 def movie_to_analyse(title):
     """
@@ -54,7 +56,7 @@ def movie_to_analyse(title):
     blobs = bucket.list_blobs(prefix=movie_path)
 
     # Get a random sample of blobs
-    sample_size = 100 # Number of images to sample as opposed to the full 1k
+    sample_size = 200 # Number of images to sample as opposed to the full 1k
     random_sample = random.sample(list(blobs), sample_size)
 
     for blob in random_sample:
@@ -75,7 +77,6 @@ def movie_to_analyse(title):
 
         # If image is detected as a face
         if len(faces) > 0:
-            #print("Processing", blob.name, "...")
 
             # Append the image with detected faces
             faces_list.append(img)
@@ -103,16 +104,14 @@ def movie_to_analyse(title):
             data.extend(d)
 
     # Write the encodings to disk
-    path_encodings = os.path.join("raw_data/deep_face_encodings/", str(movie_info["title"].values))
+    path_encodings = os.path.join("raw_data/deep_face_encodings/", movie_info["title"].values[0])
     path_encodings = str(path_encodings)
-
-    #print("Creating directory", path_encodings)
 
     # Ensure that the directory exists
     os.makedirs(str(path_encodings), exist_ok=True)
 
     # Dump the facial encodings data to disk
-    file_name = movie_info["title"].values + ".pickle"
+    file_name = movie_info["title"].values[0] + ".pickle"
     file_name = str(file_name)
 
     f = open(os.path.join(path_encodings, file_name), "wb")
@@ -134,9 +133,10 @@ def movie_to_analyse(title):
 
     # determine the total number of unique faces found in the dataset
     labelIDs = np.unique(clt.labels_)
-    numUniqueFaces = len(np.where(labelIDs > -1)[0])
 
-    grouped_faces = []
+    grouped_faces = [] # Numpy arrays for each set of grouped faces
+    grouped_imread_faces = [] # Corresponding imread objects
+    grouped_bounding_boxes = [] # Corresponding bounding boxes
 
     # Loop over the unique face integers
     for labelID in labelIDs:
@@ -145,8 +145,15 @@ def movie_to_analyse(title):
         idxs = np.where(clt.labels_ == labelID)[0]
         idxs = np.random.choice(idxs, size=min(25, len(idxs)), replace=False)
 
-        # initialize the list of faces to include in the montage
+        # Initialize the list of faces to include in the montage
         faces = []
+
+        # Initialize list to store all the coloured images for each character
+        # These images will be used for the characters the user picks to morph
+        all_faces_for_morph = []
+
+        # List to store bounding boxes for each face
+        bounding_box_faces = []
 
         # loop over the sampled indexes
         for i in idxs:
@@ -155,29 +162,53 @@ def movie_to_analyse(title):
             image_bytes = blob.download_as_string()
             nparr = np.frombuffer(image_bytes, np.uint8)
             image_color = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
             image = cv2.cvtColor(image_color, cv2.COLOR_BGR2RGB)
 
-            (top, right, bottom, left) = data[i]["loc"]
-            face = image[top:bottom, left:right]
+            # Append the coloured image for later analysis
+            all_faces_for_morph.append(image)
 
-            # force resize the face ROI to 96x96 and then add it to the
-            # faces montage list
-            # face = cv2.resize(face, (96, 96))
+            (top, right, bottom, left) = data[i]["loc"]
+
+            # Bounding boxes of the image
+            face = image[top:bottom, left:right]
+            bounding_box_faces.append(face)
+
+            # Add to the faces montage list
             faces.append(image)
 
         grouped_faces.append(faces)
+        grouped_imread_faces.append(all_faces_for_morph)
+        grouped_bounding_boxes.append(bounding_box_faces)
 
     # List to store one random photo for each character
     random_faces = []
+
+    # Lists to store the random photo's imread object and facial bounds
+    random_face_imread_list = []
+    random_face_bounds_list = []
+
     # Return one of each in grouped faces
     for i in range(len(grouped_faces)):
         random_face = random.sample(grouped_faces[i], 1)
         random_faces.append(random_face)
 
-    return random_faces
+        # Get the index of this random face
+        # Finding index where grouped_faces[i] == random_face[0]
+        indx_random_face = np.where([np.array_equal(arr, random_face[0]) for arr in grouped_faces[i]])[0][0]
+
+        # Select the random face's imread object
+        random_face_imread = grouped_imread_faces[i][indx_random_face]
+        random_face_imread_list.append(random_face_imread)
+
+        # Select the random face's bounding box
+        random_face_bounds = grouped_bounding_boxes[i][indx_random_face]
+        random_face_bounds_list.append(random_face_bounds)
+
+    return random_faces, random_face_imread_list, random_face_bounds_list
 
 def movies_to_analyse(title_1, title_2):
-    faces_movie_1 = movie_to_analyse(title_1)
-    faces_movie_2 = movie_to_analyse(title_2)
+    faces_movie_1, imread_faces_movie_1, imread_faces_bounds_movie_1 = movie_to_analyse(title_1)
+    faces_movie_2, imread_faces_movie_2, imread_faces_bounds_movie_2 = movie_to_analyse(title_2)
 
-    return faces_movie_1, faces_movie_2
+    return faces_movie_1, imread_faces_movie_1, imread_faces_bounds_movie_1, faces_movie_2, imread_faces_movie_2, imread_faces_bounds_movie_2
