@@ -96,7 +96,7 @@ st.sidebar.caption("Discover your own innovative plot!")  # Description
 
 
 # Select Genre Radio Button
-st.markdown("""<style>span[data-baseweb="tag"] {  background-color: blue !important;}</style>""", unsafe_allow_html=True)
+st.markdown("""<style>span[data-baseweb="tag"] {  background-color: red !important;}</style>""", unsafe_allow_html=True)
 genre = st.sidebar.multiselect("Choose the movie genre", df['genre'].unique(), default=df['genre'].unique())
 
 data = df.loc[df['genre'].isin(genre)]
