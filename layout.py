@@ -10,8 +10,8 @@ from cine_utils.api import openai_api
 from cine_utils.identify_faces import movies_to_analyse
 
 # Image display
-from streamlit_image_select import image_select
 from cine_utils.image_display import display_characters
+from streamlit_image_select import image_select
 
 # Imports for loading the big dataframe
 from dotenv import load_dotenv
@@ -162,15 +162,9 @@ st.sidebar.title('Movie Synopsis Merger 🍿🎬')  # Title
 st.sidebar.caption("Discover your own innovative plot!")  # Description
 
 
-<<<<<<< HEAD
-# Select Genre Radio Button
-st.markdown("""<style>span[data-baseweb="tag"] {  background-color: red !important;}</style>""", unsafe_allow_html=True)
-genre = st.sidebar.multiselect("Choose the movie genre", df['genre'].unique(), default=df['genre'].unique())
-=======
 # Genre Selection splitted in 2 columns
 st.sidebar.write('Select Genres:')
 col1, col2 = st.sidebar.columns(2)
->>>>>>> 821240b7b237df7d360ee1e85f09343226117b5e
 
 with col1:
     crime = st.checkbox('crime', value=False)
@@ -274,17 +268,10 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     st.title(f"{title_1}")
     st.session_state.title_1_char = display_characters(st.session_state.faces_title_1)
 
-    # Display images as clickable boxes
-    img_1 = image_select(label='char_1',
-                        images=st.session_state.title_1_char,
-                        center = False,
-                        width = 455,
-                        height = 256,
-                        use_container_width=True,
-                        return_value='original',
-                        label_visibility = 'hidden')
-
-    st.session_state.char_1 = img_1
+    # Displaying images
+    for i, img in enumerate(st.session_state.title_1_char):
+        if i <= 1:
+            st.image(img)
 
     ###################################
     # DISPLAYING FIRST MOVIE SYNOPSIS #
@@ -301,17 +288,12 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     st.title(f"{title_2}")
     st.session_state.title_2_char = display_characters(st.session_state.faces_title_2)
 
-    # Display images as clickable boxes
-    img_2 = image_select(label='char_2',
-                                    images=st.session_state.title_2_char,
-                                    center = False,
-                                    width = 455,
-                                    height = 256,
-                                    use_container_width=True,
-                                    return_value='original',
-                                    label_visibility = 'hidden')
+    # Displaying images
+    for i, img in enumerate(st.session_state.title_2_char):
+        if i <= 1:
+            st.image(img)
 
-    st.session_state.char_2 = img_2
+
     ####################################
     # DISPLAYING SECOND MOVIE SYNOPSIS #
     ####################################
@@ -319,39 +301,30 @@ if st.sidebar.button('Merge Movies') and len(selected_indices) == 2:
     with st.expander(f"Show/hide {title_2} synopsis"): # Dropdown to hide or show sinopsis
         st.markdown(f"""{syn_2}""")
 
+    # Save the images
+    for i, img_i in enumerate(st.session_state.imread_faces_title_1):
+        if i <= 1:
+            image = cv2.cvtColor(img_i, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(f"raw_data/morph/title_1_image{i}.png", image)
 
-    # Check if both images are selected
-    #if selected_image_1 and selected_image_2:
-    # if st.button('Merge Characters'):
+    for j, img_j in enumerate(st.session_state.imread_faces_title_2):
+        if j <= 1:
+            image = cv2.cvtColor(img_j, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(f"raw_data/morph/title_2_image{j}.png", image)
 
-    ####################
-    # SELECTED IMAGE 1 #
-    ####################
-
-    # Find the index of selected_image_1 in faces_title_1
-    indx_image_1 = index_face(st.session_state.title_1_char, st.session_state.char_1)
-
-    ####################
-    # SELECTED IMAGE 2 #
-    ####################
-
-    # Find the index of selected_image_2 in faces_title_2
-    indx_image_2 = index_face(st.session_state.title_2_char, st.session_state.char_2)
-
-    # Save the selected images
-    path_1 = "raw_data/morph/selected_image_1.png"
-    cv2.imwrite(path_1, st.session_state.imread_faces_title_1[indx_image_1])
-
-    path_2 = "raw_data/morph/selected_image_2.png"
-    cv2.imwrite(path_2, st.session_state.imread_faces_title_2[indx_image_2])
 
     ####################
     # MORPH THE IMAGES #
     ####################
 
     with st.spinner('Generating New Character'): # Spinner tho show that it's loading
+        # Get the list of files in the directory
+        files = os.listdir("raw_data/morph/")
 
-        morph_path = image_mixer_api(path_1, path_2)
+        # Get the full paths of the files
+        file_paths = [os.path.join("raw_data/morph/", file) for file in files]
+
+        morph_path = image_mixer_api(file_paths[0], file_paths[1], file_paths[2], file_paths[3])
 
         # Open the image using PIL
         morphed_image = Image.open(morph_path)

@@ -1,0 +1,619 @@
+# Import statements
+import streamlit as st
+import pandas as pd
+
+# API for the search bar
+from cine_utils.api import endpoint
+from cine_utils.api import openai_api
+
+# Identifying faces
+from cine_utils.identify_faces import movies_to_analyse
+
+# Imports for loading the big dataframe
+from dotenv import load_dotenv
+import os
+
+# Imports for morphing the characters
+from cine_utils.morph import index_face, image_mixer_api
+import cv2
+from PIL import Image
+
+#loading credentials
+load_dotenv()
+
+###################
+# LOADING DATASET #
+###################
+
+file_path = os.getenv("CINE_PICK_TABLE")
+df = pd.read_csv(file_path, sep=',')
+
+
+####################
+# STREAMLIT LAYOUT #
+####################
+
+############################
+# DEFINING JAVASCRIPT CODE #
+############################
+
+# Javascript as python string
+javascript_code = """
+<script>
+var input = document.getElementById('textfield');
+var datalist = document.getElementById('suggestions');
+
+input.addEventListener('input', function(e) {
+    var query = input.value;
+    fetch('/suggest?query=' + query)
+        .then(response => response.json())
+        .then(data => {
+            datalist.innerHTML = '';
+            data.forEach(function(suggestion) {
+                var option = document.createElement('option');
+                option.value = suggestion;
+                datalist.appendChild(option);
+            });
+        });
+});
+</script>
+"""
+
+# Render the JavaScript code using st.markdown
+st.markdown(javascript_code, unsafe_allow_html=True)
+
+# Placeholder for displaying suggestions
+st.write("<datalist id='suggestions'></datalist>", unsafe_allow_html=True)
+
+# Set the background image
+background_image = """
+<style>
+[data-testid="stAppViewContainer"] > .main {
+    background-image: url("https://trello.com/1/cards/65e743e6caf555f37ac39d9b/attachments/65eeeff70aef81df2911f2fe/download/CinePickSmall_15.png");
+    background-size: 75vw 100vh;  # This sets the size to cover 100% of the viewport width and height
+    background-position: center;
+    background-repeat: no-repeat;
+}
+</style>
+"""
+
+st.markdown(background_image, unsafe_allow_html=True)
+
+
+# Create an endpoint for the suggestion's search bar
+endpoint(df)
+
+################################
+# INITIALIZING STATE VARIABLES #
+################################
+
+if 'movies' not in st.session_state:
+    st.session_state.movies = []
+    st.session_state._movies = st.session_state.movies
+
+if 'gen_movie' not in st.session_state:
+    st.session_state.gen_movie = ''
+    st.session_state.gen_synopsis = ''
+
+if 'faces_title_1' not in st.session_state:
+    st.session_state.faces_title_1 = []
+    st.session_state.imread_faces_title_1 = []
+    st.session_state.faces_bounds_title_1 = []
+
+if 'faces_title_2' not in st.session_state:
+    st.session_state.faces_title_2 = []
+    st.session_state.imread_faces_title_2 = []
+    st.session_state.faces_bounds_title_2 = []
+
+if 'title_1_char' not in st.session_state:
+    st.session_state.title_1_char = []
+
+if 'title_2_char' not in st.session_state:
+    st.session_state.title_2_char = []
+
+if 'char_1' not in st.session_state:
+    st.session_state.char_1 = ''
+
+if 'char_2' not in st.session_state:
+    st.session_state.char_2 = ''
+
+if 'selected_image_1' not in st.session_state:
+    st.session_state.selected_image_1 = []
+
+if 'selected_image_2' not in st.session_state:
+    st.session_state.selected_image_2 = []
+
+if 'checkbox_1a' not in st.session_state:
+    st.session_state.checkbox_1a = False
+
+if 'checkbox_2a' not in st.session_state:
+    st.session_state.checkbox_1a = False
+
+if 'checkbox_3a' not in st.session_state:
+    st.session_state.checkbox_1a = False
+
+if 'checkbox_4a' not in st.session_state:
+    st.session_state.checkbox_1a = False
+
+st.session_state.movies = st.session_state._movies
+
+######################
+# DEFINING FUNCTIONS #
+######################
+
+def key_protect():
+    st.session_state._movies = st.session_state.movies
+
+
+def get_genres():
+    genres = []
+    if crime:
+        genres.append('crime')
+    if thriller:
+        genres.append('thriller')
+    if fantasy:
+        genres.append('fantasy')
+    if scifi:
+        genres.append('scifi')
+    if romance:
+        genres.append('romance')
+    if family:
+        genres.append('family')
+    if action:
+        genres.append('action')
+    if adventure:
+        genres.append('adventure')
+    if horror:
+        genres.append('horror')
+    if mistery:
+        genres.append('mistery')
+    return genres
+
+
+###################################
+# MOVIE SELECTION SIDEBAR SECTION #
+###################################
+
+# Sidebar Title
+st.sidebar.title('Movie Synopsis Merger 🍿🎬')  # Title
+st.sidebar.caption("Discover your own innovative plot!")  # Description
+
+
+# Genre Selection splitted in 2 columns
+st.sidebar.write('Select Genres:')
+col1, col2 = st.sidebar.columns(2)
+
+with col1:
+    crime = st.checkbox('crime', value=False)
+    thriller = st.checkbox('thriller', value=False)
+    fantasy = st.checkbox('fantasy', value=False)
+    scifi = st.checkbox('scifi', value=False)
+    romance = st.checkbox('romance', value=False)
+
+with col2:
+    family = st.checkbox('family', value=False)
+    action = st.checkbox('action', value=False)
+    adventure = st.checkbox('adventure', value=False)
+    horror = st.checkbox('horror', value=False)
+    mistery = st.checkbox('mistery', value=False)
+
+
+# Getting selected Genres
+genres = get_genres()
+
+# Getting Database with only selected genres
+data = df.loc[df['genre'].isin(genres)]
+
+try:
+    # Multiselect field for selecting movies
+    st.sidebar.write('')
+    st.sidebar.write('Select Movies:')
+    st.sidebar.multiselect('movies', data.index,
+                        format_func=lambda x: data['title'].loc[x].title(),
+                        key='movies',
+                        on_change=key_protect,
+                        label_visibility="collapsed")
+except Exception as e:
+    st.sidebar.warning('Cannot remove Genre that already has a selected movie.')
+
+
+# getting session variable
+selected_indices = st.session_state.movies
+
+
+# Check if more than two movies are selected
+if len(selected_indices) > 2:
+    st.sidebar.warning('Please select at most two movies.')
+    # Limit the selected indices to the first two selected indices
+    selected_indices = selected_indices[:2]
+
+
+
+#######################
+# RUNNING APPLICATION #
+#######################
+
+# When 'Merge_Characters' button is clicked
+if st.sidebar.button("Generate Movie") and len(selected_indices) == 2:
+    title_1, title_2 = df['title'].loc[selected_indices].values
+    title_1, title_2 = title_1.title(), title_2.title()
+
+    syn_1, syn_2 = df['summarized_synopsis'].loc[selected_indices].values
+
+    if st.session_state.gen_movie == '' or st.session_state.gen_synopsis == '':
+        with st.spinner('Generating New Movie'):
+            img, response = openai_api(title_1, title_2)
+            st.session_state.gen_movie = img
+            st.session_state.gen_synopsis = response.choices[0].message.content
+
+    st.title('Generated Movie Poster')
+    st.image(st.session_state.gen_movie)
+
+    st.title('Generated Synopsis')
+    merged_synopsis = st.session_state.gen_synopsis
+    st.write(merged_synopsis)
+
+    if st.session_state.faces_title_1 == [] or st.session_state.faces_title_2 == []:
+        with st.spinner('Loading Characters'):
+            faces_title_1, imread_faces_title_1, faces_bounds_title_1, faces_title_2, imread_faces_title_2, faces_bounds_title_2 = movies_to_analyse(title_1, title_2)
+            st.session_state.faces_title_1 = faces_title_1
+            st.session_state.imread_faces_title_1 = imread_faces_title_1
+            st.session_state.faces_bounds_title_1 = faces_bounds_title_1
+            st.session_state.faces_title_2 = faces_title_2
+            st.session_state.imread_faces_title_2 = imread_faces_title_2
+            st.session_state.faces_bounds_title_2 = faces_bounds_title_2
+
+
+    st.title(f"{title_1}")
+
+    ####################
+    # IMAGE CHECKBOXES #
+    ####################
+
+    ###########
+    # TITLE 1 #
+    ###########
+
+    if len(st.session_state.faces_title_1) == 1:
+        st.image(st.session_state.faces_title_1[0])
+        a1 = st.checkbox("Select", key="checkbox_1a", value=False)
+
+    elif len(st.session_state.faces_title_1) == 2:
+        st.image(st.session_state.faces_title_1[0])
+        a1 = st.checkbox("Select", key="checkbox_1a", value=False)
+
+        st.image(st.session_state.faces_title_1[1])
+        b1 = st.checkbox("Select", key="checkbox_1b", value=False)
+
+    elif len(st.session_state.faces_title_1) == 3:
+        st.image(st.session_state.faces_title_1[0])
+        a1 = st.checkbox("Select", key="checkbox_1a", value=False)
+
+        st.image(st.session_state.faces_title_1[1])
+        b1 = st.checkbox("Select", key="checkbox_1b", value=False)
+
+        st.image(st.session_state.faces_title_1[2])
+        c1 = st.checkbox("Select", key="checkbox_1c", value=False)
+
+    elif len(st.session_state.faces_title_1) == 4:
+        st.image(st.session_state.faces_title_1[0])
+        a1 = st.checkbox("Select", key="checkbox_1a", value=False)
+
+        st.image(st.session_state.faces_title_1[1])
+        b1 = st.checkbox("Select", key="checkbox_1b", value=False)
+
+        st.image(st.session_state.faces_title_1[2])
+        c1 = st.checkbox("Select", key="checkbox_1c", value=False)
+
+        st.image(st.session_state.faces_title_1[3])
+        d1 = st.checkbox("Select", key="checkbox_1d", value=False)
+
+    ######################################
+    # Check if the checkboxes are ticked #
+    ######################################
+
+    if a1:
+        try:
+            st.session_state.checkbox_1b = False
+        except:
+            pass
+
+        try:
+            st.session_state.checkbox_1c = False
+        except:
+            pass
+
+        try:
+            st.session_state.checkbox_1d = False
+        except:
+            pass
+    try:
+        if b1:
+            try:
+                st.session_state.checkbox_1a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1c = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1d = False
+            except:
+                pass
+    except:
+        pass
+    try:
+        if c1:
+            try:
+                st.session_state.checkbox_1a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1b = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1d = False
+            except:
+                pass
+    except:
+        pass
+    try:
+        if d1:
+            try:
+                st.session_state.checkbox_1a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1b = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_1c = False
+            except:
+                pass
+    except:
+        pass
+
+    # Get the final states of the checkboxes
+    try:
+        a1_selected = st.session_state.checkbox_1a
+    except:
+        pass
+    try:
+        b1_selected = st.session_state.checkbox_1b
+    except:
+        pass
+    try:
+        c1_selected = st.session_state.checkbox_1c
+    except:
+        pass
+    try:
+        d1_selected = st.session_state.checkbox_1d
+    except:
+        pass
+
+
+    # Check what was selected
+    try:
+        if a1_selected:
+            st.session_state.char_1 = st.session_state.title_1_char[0]
+    except:
+        pass
+
+    try:
+        if b1_selected:
+            st.session_state.char_1 = st.session_state.title_1_char[1]
+    except:
+        pass
+
+    try:
+        if c1_selected:
+            st.session_state.char_1 = st.session_state.title_1_char[2]
+    except:
+        pass
+
+    try:
+        if d1_selected:
+            st.session_state.char_1 = st.session_state.title_1_char[3]
+    except:
+        pass
+
+    ###################################
+    # DISPLAYING FIRST MOVIE SYNOPSIS #
+    ###################################
+
+    with st.expander(f"Show/hide {title_1} synopsis"): # Dropdown to hide or show sinopsis
+        st.markdown(f"""{syn_1}""")
+
+
+    ###########
+    # TITLE 2 #
+    ###########
+
+    st.title(f"{title_2}")
+
+    if len(st.session_state.faces_title_2) == 1:
+        st.image(st.session_state.faces_title_2[0])
+        a2 = st.checkbox("Select", key="checkbox_2a", value=False)
+
+    elif len(st.session_state.faces_title_2) == 2:
+        st.image(st.session_state.faces_title_2[0])
+        a2 = st.checkbox("Select", key="checkbox_2a", value=False)
+
+        st.image(st.session_state.faces_title_2[1])
+        b2 = st.checkbox("Select", key="checkbox_2b", value=False)
+
+    elif len(st.session_state.faces_title_2) == 3:
+        st.image(st.session_state.faces_title_2[0])
+        a2 = st.checkbox("Select", key="checkbox_2a", value=False)
+
+        st.image(st.session_state.faces_title_2[1])
+        b2 = st.checkbox("Select", key="checkbox_2b", value=False)
+
+        st.image(st.session_state.faces_title_2[2])
+        c2 = st.checkbox("Select", key="checkbox_2c", value=False)
+
+    elif len(st.session_state.faces_title_2) == 4:
+        st.image(st.session_state.faces_title_2[0])
+        a2 = st.checkbox("Select", key="checkbox_2a", value=False)
+
+        st.image(st.session_state.faces_title_2[1])
+        b2 = st.checkbox("Select", key="checkbox_2b", value=False)
+
+        st.image(st.session_state.faces_title_2[2])
+        c2 = st.checkbox("Select", key="checkbox_2c", value=False)
+
+        st.image(st.session_state.faces_title_2[3])
+        d2 = st.checkbox("Select", key="checkbox_2d", value=False)
+
+    ######################################
+    # Check if the checkboxes are ticked #
+    ######################################
+
+    if a2:
+        try:
+            st.session_state.checkbox_2b = False
+        except:
+            pass
+
+        try:
+            st.session_state.checkbox_2c = False
+        except:
+            pass
+
+        try:
+            st.session_state.checkbox_2d = False
+        except:
+            pass
+    try:
+        if b2:
+            try:
+                st.session_state.checkbox_2a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2c = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2d = False
+            except:
+                pass
+    except:
+        pass
+    try:
+        if c2:
+            try:
+                st.session_state.checkbox_2a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2b = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2d = False
+            except:
+                pass
+    except:
+        pass
+    try:
+        if d2:
+            try:
+                st.session_state.checkbox_2a = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2b = False
+            except:
+                pass
+
+            try:
+                st.session_state.checkbox_2c = False
+            except:
+                pass
+    except:
+        pass
+
+    # Get the final states of the checkboxes
+    try:
+        a2_selected = st.session_state.checkbox_2a
+    except:
+        pass
+    try:
+        b2_selected = st.session_state.checkbox_2b
+    except:
+        pass
+    try:
+        c2_selected = st.session_state.checkbox_2c
+    except:
+        pass
+    try:
+        d2_selected = st.session_state.checkbox_2d
+    except:
+        pass
+
+
+    # Check what was selected
+    try:
+        if a2_selected:
+            st.session_state.char_2 = st.session_state.title_2_char[0]
+    except:
+        pass
+
+    try:
+        if b2_selected:
+            st.session_state.char_2 = st.session_state.title_2_char[1]
+    except:
+        pass
+
+    try:
+        if c2_selected:
+            st.session_state.char_2 = st.session_state.title_2_char[2]
+    except:
+        pass
+
+    try:
+        if d2_selected:
+            st.session_state.char_2 = st.session_state.title_2_char[3]
+    except:
+        pass
+
+    ####################################
+    # DISPLAYING SECOND MOVIE SYNOPSIS #
+    ####################################
+
+    with st.expander(f"Show/hide {title_2} synopsis"): # Dropdown to hide or show sinopsis
+        st.markdown(f"""{syn_2}""")
+
+    ############################
+    # CONTINUING WITH THE CODE #
+    ############################
+    if st.session_state.char_1 and st.session_state.char_2  and st.button("Merge Characters"):
+        indx_image_1 = index_face(st.session_state.title_1_char, st.session_state.char_1)
+        indx_image_2 = index_face(st.session_state.title_2_char, st.session_state.char_2)
+
+        path_1 = "raw_data/morph/selected_image_1.png"
+        cv2.imwrite(path_1, st.session_state.imread_faces_title_1[indx_image_1])
+
+        path_2 = "raw_data/morph/selected_image_2.png"
+        cv2.imwrite(path_2, st.session_state.imread_faces_title_2[indx_image_2])
+
+        with st.spinner('Generating New Character'):
+            morph_path = image_mixer_api(path_1, path_2)
+            morphed_image = Image.open(morph_path)
+            st.title('Generated Character')
+            st.image(morphed_image)
